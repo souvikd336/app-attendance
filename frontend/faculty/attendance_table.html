@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance</title>
+    <style type="text/css">
+        .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}
+        .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}
+        .tftable tr {background-color:#ffffff;}
+        .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}
+        .tftable tr:hover {background-color:#e0ffff;}
+    </style>
+</head>
+<body>
+    <table class="tftable" border="1">
+        <thead>
+            <tr>
+                <th>Attendance ID</th>
+                <th>Date</th>
+                <th>Student ID</th>
+                <th>Paper ID</th>
+                <th>Present</th>
+            </tr>
+        </thead>
+        <tbody id="attendance_table">
+            <!-- Rows will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <script>
+
+        // Function to create and append table rows
+        function populateTable() {
+            const tableBody = document.getElementById("attendance_table");
+
+            // Get saved data from sessionStorage
+            let data = sessionStorage.getItem("att_data");
+            
+            if (data) {
+                try {
+                    // Parse the JSON string into an object
+                    data = JSON.parse(data);
+
+                    // Make sure data is an array and has at least one element
+                    if (Array.isArray(data) && data.length > 0) {
+                        // Loop through the data array and create table rows
+                        data.forEach(item => {
+                            const row = document.createElement("tr");
+                            
+                            // Create and append table cells
+                            const att_id = document.createElement("td");
+                            att_id.innerHTML = item.att_id;
+                            row.appendChild(att_id);
+
+                            const att_date = document.createElement("td");
+                            att_date.innerHTML = item.att_date;
+                            row.appendChild(att_date);
+
+                            const s_id = document.createElement("td");
+                            s_id.innerHTML = item.s_id;
+                            row.appendChild(s_id);
+
+                            const paper_id = document.createElement("td");
+                            paper_id.innerHTML = item.paper_id;
+                            row.appendChild(paper_id);
+
+                            const present = document.createElement("td");
+                            present.innerHTML = item.present;
+                            row.appendChild(present);
+
+                            // Append the row to the table body
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        console.error("Data is not an array or is empty");
+                    }
+                } catch (e) {
+                    console.error("Failed to parse JSON data:", e);
+                }
+            } else {
+                console.error("No data found in sessionStorage");
+            }
+        }
+
+        // Call the populateTable function to create and append table rows
+        populateTable();
+    </script>
+</body>
+</html>

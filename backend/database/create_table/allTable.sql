@@ -1,0 +1,66 @@
+"This table stores information about students enrolled in the college."
+CREATE USER 'SRM_ADMIN'@'localhost' IDENTIFIED BY 'Minor!1';
+CREATE TABLE STUDENTS (
+    StudentID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(50) NOT NULL,
+    Email VARCHAR(100),
+    DepartmentId VARCHAR(30),
+    Sem VARCHAR(2),
+    Year VARCHAR(4)
+);
+INSERT INTO STUDENTS(StudentID, Name, Email, DepartmentId, Sem, Year) VALUES(401,"SOUVIK DAS", "SOUVIKD465@GMAIL.COM", "2", "3", "2022");
+SELECT * FROM STUDENTS;
+
+INSERT INTO STUDENTS(Name, Email, DepartmentId, Sem, Year) VALUES("Pritam DAS", "PD465@GMAIL.COM", "1", "1", "2024");
+
+
+CREATE TABLE ADMIN_USERS (
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL, -- Hashed password
+    email VARCHAR(100) NOT NULL UNIQUE,
+    role VARCHAR(10) DEFAULT "admin",
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE STUDENTS (
+    s_id INT AUTO_INCREMENT PRIMARY KEY,
+    s_name VARCHAR(50) NOT NULL,
+    s_email VARCHAR(100) NOT NULL UNIQUE,
+    s_gender VARCHAR(10) NOT NULL,
+    password VARCHAR(255) NOT NULL, -- Hashed password
+    sem INT NOT NULL,
+    year INT NOT NULL
+);
+ALTER TABLE STUDENTS
+ADD DepartmentId VARCHAR(50) NOT NULL;
+
+ALTER TABLE STUDENTS
+MODIFY password VARCHAR(255) DEFAULT "12345";
+
+ALTER TABLE STUDENTS
+MODIFY year VARCHAR(10) NOT NULL;
+
+
+CREATE TABLE SUBJECT (
+    paper_id INT AUTO_INCREMENT PRIMARY KEY,
+    paper_name VARCHAR(50) UNIQUE,
+    DepartmentId VARCHAR(50) NOT NULL,
+    sem INT NOT NULL
+);
+CREATE TABLE FACULTY (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_name VARCHAR(50) NOT NULL,
+    f_email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,  -- Hashed password
+    DepartmentId VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE ATTENDANCE_MCA_SEM_1(
+    att_id INT PRIMARY KEY AUTO_INCREMENT,
+    att_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    s_id INT NOT NULL,
+    paper_id INT NOT NULL,
+    present INT NOT NULL
+);

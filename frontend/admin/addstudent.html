@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+    <script src="script.js"></script>
+    <style>
+        .form-group{
+            padding: 20px; 
+            width: 500px;
+            overflow: auto;
+            text-align-last: center;
+            position: relative;
+            left: 30%;
+
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">Attendance Management System</a>
+          </div>
+          <ul class="nav navbar-nav">
+            <li><a href="#">Home</a></li>
+            <li class="active"><a href="addsubject.html">Subject-Control</a></li>
+            <li><a href="addfaculty.html">Faculty-Control</a></li>
+            <li><a href="addstudent.html">Student-Control</a></li>
+          </ul>
+          <button class="btn btn-danger navbar-btn" onclick="logout()">Logout</button>
+          
+        </div>
+      </nav>
+    <div id="main">
+    <form>
+        <div class="form-group">
+            <h3 class="card-title">Add Subject</h3>
+        </div>
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Student Name</label>
+        <input type="text" class="form-control" id="FormControlInput1" placeholder="enter  name">
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlInput2">Email Id</label>
+        <input type="text" class="form-control" id="FormControlInput2" placeholder="enter email">
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlSelect1">Gender</label>
+        <select class="form-control" id="FormControlSelect1">
+          <option>male</option>
+          <option>female</option>
+          <option>others</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlInput3">Year</label>
+        <input type="number" class="form-control" id="FormControlInput3" min="2022" max="2099" step="1" value="2024" />
+      </div>
+      
+      <div class="form-group">
+        <label for="exampleFormControlInput3">Department Id</label>
+        <input type="text" class="form-control" id="FormControlInput3" placeholder="enter Department Id">
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlSelect2">Semester</label>
+        <select class="form-control" id="FormControlSelect2">
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input type="button" class="btn btn-primary" id="formControlButton1" value="Submit" onclick="addSubject()">
+      </div>
+      <div class="form-group">
+        <p id="message"></p>
+      </div>
+      
+    </form>
+</div>
+</body>
+<script>
+    const BASE_URL = "http://localhost:4000/api/v1/subject-register"
+    function addSubject(){
+        let paper_name = document.getElementById('FormControlInput1');
+        let DepartmentId = document.getElementById('FormControlInput2');
+        let sem = document.getElementById('FormControlSelect1');
+
+        let stored = localStorage['myKey'];
+        
+        axios.post(BASE_URL, {
+            paper_name: paper_name.value,
+            DepartmentId: DepartmentId.value,
+            sem: sem.value
+        }).then(function (response) {
+            console.log(response);    
+            const data = document.getElementById('message');
+        
+            data.innerHTML = response.data.message;
+            setTimeout(Reload, 5000);
+    })
+    }
+    function Reload(){
+        location.reload();
+    }
+</script>
+</html>

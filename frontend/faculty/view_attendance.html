@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Attendance</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+    <script src="script.js"></script>
+    <style>
+        .form-group{
+            padding: 20px; 
+            width: 500px;
+            overflow: auto;
+            text-align-last: center;
+            position: relative;
+            left: 30%;
+
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="faculty_home.html">Attendance Management System</a>
+          </div>
+          <ul class="nav navbar-nav">
+            <li><a href="#">Home</a></li>
+            <li class="active"><a href="view_attendance.html">View Attendance</a></li>
+            <li><a href="3_give.html">Give Attendance</a></li>
+          </ul>
+          <button class="btn btn-danger navbar-btn" onclick="logout()">Logout</button>
+          
+        </div>
+      </nav>
+    <div id="main">
+    <form>
+        <div class="form-group">
+            <h3 class="card-title">View Attendance</h3>
+        </div>
+        <div class="form-group">
+          <label for="exampleFormControlSelect2">Semester</label>
+          <select class="form-control" id="FormControlSelect2">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+          </select>
+        </div>
+      <div class="form-group">
+        <label for="exampleFormControlInput2">Department Id</label>
+        <input type="text" class="form-control" id="FormControlInput2" placeholder="Department id">
+      </div>
+      <div class="form-group">
+        <input type="button" class="btn btn-primary" id="formControlButton1" value="Submit" onclick="viewAttendance()">
+      </div>
+      <div class="form-group">
+        <p id="message"></p>
+      </div>
+      
+    </form>
+</div>
+</body>
+<script>
+  const BASE_URL = "http://localhost:4000/api/v1/attendance/viewAttendance"
+  function viewAttendance(){
+      let sem = document.getElementById('FormControlSelect2');
+      let DepartmentId = document.getElementById('FormControlInput2');;
+      //let stored = localStorage['myKey'];
+
+      axios.post(BASE_URL, {
+          sem: sem.value,
+          departmentId: DepartmentId.value
+      }).then(function (response) {
+          console.log(response.data);    
+          const data = document.getElementById('message');
+          if (response.data.success === true){
+            data.innerHTML = "Got the Data";
+            // Save data to sessionStorage
+            console.log(response.data.attendance);
+            let att_data = response.data.attendance;
+            console.log(att_data);
+            sessionStorage.setItem("att_data", JSON.stringify(att_data));
+            window.location.assign("attendance_table.html");
+          } else {
+            data.innerHTML = "No Data found";
+          }  
+  })
+  }
+</script>
+</html>

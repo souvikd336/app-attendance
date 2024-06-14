@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Attendance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+            max-width: 300px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            text-align: center;
+            margin: 10px 0;
+        }
+        .attendance-form {
+            margin-top: 20px;
+        }
+        .attendance-form table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .attendance-form th, .attendance-form td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .attendance-form th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mark Attendance</h1>
+    <form id="fetchStudentsForm">
+        <select id="sem" required>
+            <option value="">Select Semester</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+        </select>
+            <input type="text" id="departmentId" placeholder="Department ID" required>
+            <select id="paperId">
+                <option value="">Select Paper</option>
+                <!-- Options will be populated dynamically -->
+            </select>
+            <button type="submit">Fetch Students</button>
+        </form>
+        <div class="message" id="message"></div>
+        <form id="attendanceForm" class="attendance-form" style="display: none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Present</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                    <!-- Students will be populated here -->
+                </tbody>
+            </table>
+            <button type="submit">Submit Attendance</button>
+        </form>
+    
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script>
+            document.getElementById('fetchStudentsForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+    
+                const semester = document.getElementById('sem').value;
+                const departmentId = document.getElementById('departmentId').value;
+                const paperIdSelect = document.getElementById('paperId');
+    
+                try {
+                    // Fetch papers
+                    const paperResponse = await axios.get('http://localhost:4000/api/v1/attendance/papers', {
+                        params: {
+                            semester: semester,
+                            departmentId: departmentId
+                        }
+                    });
+    
+                    // Populate papers dropdown
+                    paperIdSelect.innerHTML = '<option value="">Select Paper</option>';
+                    if (paperResponse.status === 200 && paperResponse.data.papers.length > 0) {
+                        paperResponse.data.papers.forEach(paper => {
+                            const option = document.createElement('option');
+                            option.value = paper.paper_id;
+                            option.textContent = paper.paper_name;
+                            paperIdSelect.appendChild(option);
+                        });
+                    } else {
+                        paperIdSelect.innerHTML = '<option value="">No Papers Found</option>';
+                    }
+    
+                    // Fetch students
+                    const studentResponse = await axios.get('http://localhost:4000/api/v1/attendance/students', {
+                        params: {
+                            semester: semester,
+                            departmentId: departmentId
+                        }
+                    });
+    
+                    const result = studentResponse.data;
+                    const messageDiv = document.getElementById('message');
+                    const studentsTableBody = document.getElementById('studentsTableBody');
+                    const attendanceForm = document.getElementById('attendanceForm');
+    
+                    if (studentResponse.status === 200 && result.students && result.students.length > 0) {
+                        studentsTableBody.innerHTML = '';
+                        result.students.forEach(student => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${student.s_id}</td>
+                                <td>${student.s_name}</td>
+                                <td>
+                                    <select name="present_${student.s_id}">
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </td>
+                            `;
+                            studentsTableBody.appendChild(row);
+                        });
+                        attendanceForm.style.display = 'block';
+                        messageDiv.textContent = '';
+                    } else {
+                        attendanceForm.style.display = 'none';
+                        messageDiv.textContent = result.message || 'No students found';
+                        messageDiv.style.color = 'red';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    const messageDiv = document.getElementById('message');
+                    messageDiv.textContent = 'An error occurred. Please try again.';
+                    messageDiv.style.color = 'red';
+                }
+            });
+    
+            document.getElementById('attendanceForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+    
+                const semester = document.getElementById('sem').value;
+                const departmentId = document.getElementById('departmentId').value;
+                const paperId = document.getElementById('paperId').value;
+                const studentsTableBody = document.getElementById('studentsTableBody');
+    
+                const promises = [];
+                studentsTableBody.querySelectorAll('tr').forEach(row => {
+                    const studentId = row.cells[0].textContent;
+                    const present = row.querySelector(`select[name="present_${studentId}"]`).value;
+    
+                    const attendanceData = {
+                        s_id: studentId,
+                        paper_id: paperId,
+                        present,
+                        sem: semester,
+                        departmentId
+                    };
+    
+                    const request = axios.post('http://localhost:4000/api/v1/attendance/addAttendance', attendanceData);
+                    promises.push(request);
+                });
+    
+                try {
+                    const responses = await Promise.all(promises);
+    
+                    const messageDiv = document.getElementById('message');
+                    const successfulResponses = responses.filter(response => response.status === 200);
+    
+                    if (successfulResponses.length === responses.length) {
+                        messageDiv.textContent = 'Attendance marked successfully for all students';
+                        messageDiv.style.color = 'green';
+                    } else {
+                        messageDiv.textContent = 'Some attendance records failed to submit';
+                        messageDiv.style.color = 'red';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    const messageDiv = document.getElementById('message');
+                    messageDiv.textContent = 'An error occurred. Please try again.';
+                    messageDiv.style.color = 'red';
+                }
+            });
+        </script>
+    </body>
+    </html>
+    

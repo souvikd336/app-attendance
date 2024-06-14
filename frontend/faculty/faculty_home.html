@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Faculty Home</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Attendance Management System</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="#">Home</a></li>
+      <li><a href="view_attendance.html">View Attendance</a></li>
+      <li><a href="3_give.html">Give Attendance</a></li>
+    </ul>
+    <button class="btn btn-danger navbar-btn" onclick="logout()">Logout</button>
+    
+  </div>
+</nav>
+
+
+<div class="container">
+  <h2>Faculty Route</h2>
+  <h3>Welcome Faculty</h3>
+  <p></p>
+</div>
+
+
+
+
+</body>
+<script>
+
+function logout(){
+
+  url = "http://localhost:4000/api/v1/logout"
+  axios.get(url).then(function (response) {
+        
+        console.log(response);
+        const data = document.querySelector('h3');
+        data.innerHTML = response.data.message;
+        
+        // do whatever you want if console is [object object] then stringify the response
+        setTimeout(myURL, 5000);
+        const message = document.querySelector('p');
+        message.innerHTML = `The page will load after delay of 5 seconds using setTimeout()  method.`
+    })
+}
+function myURL() {
+         window.open('login.html', name = self);
+      }
+
+
+
+</script>
+</html>
